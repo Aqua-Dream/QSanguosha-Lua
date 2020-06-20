@@ -43,11 +43,11 @@
 
 备注：
  - 整装可以指定六个阶段之一：
-   1. 回合开始阶段：优先考虑需要觉醒的队友(如[魂姿](https://sanguosha.fandom.com/zh/wiki/%E5%AD%99%E7%AD%96)、[若愚](https://sanguosha.fandom.com/zh/ wiki/%E5%88%98%E7%A6%85)、[志继](https://sanguosha.fandom.com/zh/wiki/%E5%A7%9C%E7%BB%B4)等)的队友。注意不能用来将武将牌翻回正面朝上。
+   1. 回合开始阶段：优先考虑觉醒技能(如[魂姿](https://sanguosha.fandom.com/zh/wiki/%E5%AD%99%E7%AD%96)、[若愚](https://sanguosha.fandom.com/zh/wiki/%E5%88%98%E7%A6%85)、[志继](https://sanguosha.fandom.com/zh/wiki/%E5%A7%9C%E7%BB%B4)等)。注意额外的回合开始阶段不能用来将武将牌翻回正面朝上。
    2. 判定阶段：如果队友手牌远大于血量但判定区有【乐不思蜀】，可以指定判定阶段让【乐不思蜀】判定后消失，不产生跳过出牌阶段的效果。
-   3. 摸牌阶段：可以优先考虑指定有[突袭](https://sanguosha.fandom.com/zh/wiki/%E5%BC%A0%E8%BE%BD)、[庸肆](https://sanguosha.fandom.com/zh/wiki/ SP%E8%A2%81%E6%9C%AF)、[好施](https://sanguosha.fandom.com/zh/wiki/%E9%B2%81%E8%82%83)等技能的队友。
-   4. 出牌阶段：一般指定手牌多的队友，或者有强力技能(如[奇策](https://sanguosha.fandom.com/zh/wiki/%E8%8D%80%E6%94%B8)、[安恤](https://sanguosha.fandom.com /zh/wiki/%E6%AD%A5%E7%BB%83%E5%B8%88)、[缔盟](https://sanguosha.fandom.com/zh/wiki/%E9%B2%81%E8%82%83)等)的队友。
-   5. 弃牌阶段：一般指定手牌远多于血量的敌人，或者有与弃牌相关技能(如[庸肆](https://sanguosha.fandom.com/zh/wiki/SP%E8%A2%81%E6%9C%AF)、[琴音]( https://sanguosha.fandom.com/zh/wiki/%E7%A5%9E%E5%91%A8%E7%91%9C)、[旋风](https://sanguosha.fandom.com/zh/wiki/%E5%87%8C%E7%BB%9F)等) 的队友或敌人。
+   3. 摸牌阶段：可以优先考虑指定有[突袭](https://sanguosha.fandom.com/zh/wiki/%E5%BC%A0%E8%BE%BD)、[庸肆](https://sanguosha.fandom.com/zh/wiki/SP%E8%A2%81%E6%9C%AF)、[好施](https://sanguosha.fandom.com/zh/wiki/%E9%B2%81%E8%82%83)等技能的队友。
+   4. 出牌阶段：一般指定手牌多的队友，或者有强力技能(如[奇策](https://sanguosha.fandom.com/zh/wiki/%E8%8D%80%E6%94%B8)、[安恤](https://sanguosha.fandom.com/zh/wiki/%E6%AD%A5%E7%BB%83%E5%B8%88)、[缔盟](https://sanguosha.fandom.com/zh/wiki/%E9%B2%81%E8%82%83)等)的队友。
+   5. 弃牌阶段：一般指定手牌远多于血量的敌人，或者有与弃牌相关技能(如[庸肆](https://sanguosha.fandom.com/zh/wiki/SP%E8%A2%81%E6%9C%AF)、[琴音](https://sanguosha.fandom.com/zh/wiki/%E7%A5%9E%E5%91%A8%E7%91%9C)、[旋风](https://sanguosha.fandom.com/zh/wiki/%E5%87%8C%E7%BB%9F)等)的队友或敌人。
    6. 回合结束阶段：优先考虑在此阶段有特殊技能(如[据守](https://sanguosha.fandom.com/zh/wiki/%E6%9B%B9%E4%BB%81)、[崩坏](https://sanguosha.fandom.com/zh/wiki/%E8%91%A3%E5%8D%93)等)的队友或敌人。
  - 大乔的[国色](https://sanguosha.fandom.com/zh/wiki/%E5%A4%A7%E4%B9%94)转化牌从判定区被弃置时，逗乐无法获得之，除非它是方块的【乐不思蜀】。
 
@@ -77,4 +77,4 @@
  - 霸权在弃置【杀】之后使用【南蛮入侵】，弃置【闪】之后使用【万箭齐发】或【酒】【杀】都有很好的效果。注意，【杀】与【雷杀】和【火杀】都是同名牌。
  - 霸权不能禁止转化牌的使用，如【八卦阵】【丈八蛇矛】、[武圣](https://sanguosha.fandom.com/zh/wiki/%E5%85%B3%E7%BE%BD)、[急救](https://sanguosha.fandom.com/zh/wiki/%E5%8D%8E%E4%BD%97)、[看破](https://sanguosha.fandom.com/zh/wiki/%E5%8D%A7%E9%BE%99%E8%AF%B8%E8%91%9B%E4%BA%AE)等，即使被转化牌已被禁止。例如，由武圣将红色【杀】转化为【杀】也能正常使用或打出，即使【杀】被霸权禁止。
  - 凌弱的体力值判定在濒死结算之后。例如，1体力的你对其他角色造成伤害使其进入濒死状态，若其随后阵亡，你可以因凌弱摸一张牌；若其使用【桃】回复至1体力，则你不可以摸牌。
- - 双标：同势力角色不受霸权影响的效果为锁定技，但不为主公时无此效果。
+ - 双标：同势力角色不受霸权影响的效果为锁定技，因此需要谨慎选择自己的势力。但不为主公时无此效果。
