@@ -475,8 +475,9 @@ lingruo = sgs.CreateTriggerSkill{
     events = {sgs.Damage},
     frequency = sgs.Skill_Frequent,
     on_trigger = function(self, event, player, data)
-        if data:toDamage().to:getHp() < player:getHp() and player:getRoom():askForSkillInvoke(player, self:objectName(), data)  then
+        if data:toDamage().to:getHp() < player:getHp() and not player:hasFlag("lingruo_drawed") and player:getRoom():askForSkillInvoke(player, self:objectName(), data)  then
                 player:drawCards(1)
+                player:setFlags("lingruo_drawed")
         end
         return false
     end
