@@ -919,3 +919,227 @@ alphatuxi = sgs.CreateTriggerSkill{
 	end
 }
 ```
+
+# 贾克斯
+## 宗师
+**锁定技** 出牌阶段开始时，你获得一张武器牌的攻击范围和效果直到出牌阶段结束。
+``` lua
+zongshiKylinBowSkill = sgs.CreateTriggerSkill{
+    name = "#zongshiKylinBowSkill",
+    events = {sgs.DamageCaused},
+    on_trigger = function(self, event, player, data)
+        local damage = data:toDamage()
+        if damage.card and damage.card:isKindOf("Slash") and damage.by_user and not damage.chain and not damage.transfer then
+            local horses = {}
+            if damage.to:getDefensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getDefensiveHorse():getEffectiveId()) then
+                table.insert(horses, "zongshi-dhorse")
+            end
+            if damage.to:getOffensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getOffensiveHorse():getEffectiveId()) then
+                table.insert(horses, "zongshi-ohorse")
+            end
+
+            if #horses == 0 or not player or not player:hasSkill("jaxZongshi") or not player:askForSkillInvoke("jaxZongshi", data) then
+                return false
+            end
+            local room = player:getRoom()
+            room:broadcastSkillInvoke("jaxZongshi")
+            
+            local horse_type = room:askForChoice(player, "jaxZongshi", table.concat(horses, "+"))
+            if horse_type == "zongshi-dhorse" then
+                room:throwCard(damage.to:getDefensiveHorse(), damage.to, damage.from)
+            else
+                room:throwCard(damage.to:getOffensiveHorse(), damage.to, damage.from)
+            end
+        end
+        return false
+    end
+}
+
+--丈八蛇矛
+jaxZongshi = sgs.CreateViewAsSkill{
+    name = "jaxZongshi" ,
+    n = 2,
+    view_filter = function(self, selected, to_select)
+        return (#selected < 2) and (not to_select:isEquipped())
+    end ,
+    view_as = function(self, cards)
+        if #cards ~= 2 then return nil end
+        local slash = sgs.Sanguosha:cloneCard("Slash", sgs.Card_SuitToBeDecided, 0)
+        slash:setSkillName("spear")
+        slash:addSubcard(cards[1])
+        slash:addSubcard(cards[2])
+        return slash
+    end ,
+    enabled_at_play = function(self, player)
+        return player:property("jaxZongshi-weapon"):toString() == "spear" and (player:getHandcardNum() >= 2) and sgs.Slash_IsAvailable(player)
+    end ,
+    enabled_at_response = function(self, player, pattern)
+        return player:property("jaxZongshi-weapon"):toString() == "spear" and (player:getHandcardNum() >= 2) and (pattern == "slash")
+    end
+}
+
+jaxZongshiTargetMod = sgs.CreateTargetModSkill{
+    name = "#jaxZongshiTargetMod",
+    pattern = "Slash",
+    distance_limit_func = function(self, from, card)
+        local weapon = from:property("jaxZongshi-weapon"):toString()
+        if not weapon or not from:hasSkill("jaxZongshi") then return 0 end
+        if weapon == "guding_blade" or weapon == "double_sword" or weapon == "qinggang_sword" or weapon == "ice_sword" then
+            return 1
+        elseif weapon == "axe" or weapon == "blade" or weapon == "spear" then
+            return 2
+        elseif weapon == "fan" or weapon == "halberd" then 
+            return 3
+        elseif weapon == "kylin_bow" then
+            return 4
+        end
+        return 0
+    end,
+    residue_func = function(self, player)
+        if player:hasSkill("jaxZongshi") and player:property("jaxZongshi-weapon"):toString() == "crossbow" then
+            return 999
+        else
+            return 0
+        end
+    end,
+    extra_target_func = function(self, from, card)
+        if from:hasSkill("jaxZongshi") and from:property("jaxZongshi-weapon"):toString() == "halberd" and from:isLastHandCard(card) then
+            return 2
+        else
+            return 0
+        end
+    end
+}
+
+jaxZongshiTrigger = sgs.CreateTriggerSkill{
+    name = "jaxZongshi",
+    events = {sgs.DamageCaused,sgs.TargetSpecified,sgs.SlashMissed,sgs.PreCardUsed,sgs.EventPhaseStart,sgs.EventPhaseEnd},
+    view_as_skill = jaxZongshi,
+    on_trigger = function(self, event, player, data)
+        if not player or not player:hasSkill("jaxZongshi") then return false end
+        local room = player:getRoom()
+        local weapon = player:property("jaxZongshi-weapon") :toString()
+        if event == sgs.DamageCaused then
+            local damage = data:toDamage()
+            if damage.card and damage.card:isKindOf("Slash")  and damage.by_user and not damage.chain and not damage.transfer then
+                if weapon == "ice_sword" and not damage.to:isNude() and damage.from:canDiscard(damage.to, "he") and player:askForSkillInvoke("ice_sword", data) then
+                    room:setEmotion(player, "weapon/ice_sword")
+                    local card_id = room:askForCardChosen(player, damage.to, "he", "ice_sword", false, sgs.Card_MethodDiscard);
+                    room:throwCard(sgs.Sanguosha:getCard(card_id), damage.to, damage.from)
+                    if damage.from:isAlive() and damage.to:isAlive() and damage.from:canDiscard(damage.to, "he") then
+                        card_id = room:askForCardChosen(player, damage.to, "he", "ice_sword", false, sgs.Card_MethodDiscard)
+                        room:throwCard(sgs.Sanguosha:getCard(card_id), damage.to, damage.from)
+                    end
+                    return true
+                elseif weapon == "guding_blade" and damage.to:isKongcheng() then
+                    room:setEmotion(player, "weapon/guding_blade")
+                    local log = sgs.LogMessage()
+                    log.type = "#GudingBladeEffect"
+                    log.from = player
+                    log.to:append(damage.to)
+                    log.arg = tostring(damage.damage)
+                    damage.damage = damage.damage + 1
+                    log.arg2 = tostring(damage.damage)
+                    room:sendLog(log)
+                    data:setValue(damage)
+                elseif weapon == "kylin_bow" then
+                    local horses = {}
+                    if damage.to:getDefensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getDefensiveHorse():getEffectiveId()) then
+                        table.insert(horses, "dhorse")
+                    end
+                    if damage.to:getOffensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getOffensiveHorse():getEffectiveId()) then
+                        table.insert(horses, "ohorse")
+                    end
+                    if #horses == 0 or not player:askForSkillInvoke("kylin_bow", data) then
+                        return false
+                    end
+                    room:setEmotion(player, "weapon/kylin_bow")
+                    local horse_type = room:askForChoice(player, "kylin_bow", table.concat(horses, "+"))
+                    if horse_type == "dhorse" then
+                        room:throwCard(damage.to:getDefensiveHorse(), damage.to, damage.from)
+                    else
+                        room:throwCard(damage.to:getOffensiveHorse(), damage.to, damage.from)
+                    end
+                end
+            end
+        elseif event==sgs.TargetSpecified then
+            local use = data:toCardUse()
+            if not use.card:isKindOf("Slash") then return false end
+            if weapon == "double_sword" then
+                for _,p in sgs.qlist(use.to) do
+                    if p:getGender() ~= use.from:getGender() and use.from:askForSkillInvoke("double_sword") then
+                        room:setEmotion(use.from, "weapon/double_sword")
+                        if not p:canDiscard(p, "h") or not room:askForCard(p, ".", "double-sword-card:"..use.from:objectName(),data) then
+                            use.from:drawCards(1, "double_sword")
+                        end
+                    end
+                end
+            elseif weapon == "qinggang_sword" then
+                local do_anim = false
+                for _,p in sgs.qlist(use.to) do
+                    if (p:getArmor() and p:hasArmorEffect(p:getArmor():objectName())) or p:hasSkills("bazhen|linglong|bossmanjia") then
+                        do_anim = true
+                        p:addQinggangTag(use.card)
+                    end
+                end
+                if do_anim then
+                    room:setEmotion(use.from, "weapon/qinggang_sword")
+                end
+            elseif weapon == "crossbow" and use.from:hasFlag("Global_MoreSlashInOneTurn") then
+                room:setEmotion(use.from, "weapon/crossbow")
+            elseif weapon == "halberd" and use.to:length() > 1 then
+                room:setEmotion(use.from, "weapon/halberd")
+            end
+        elseif event == sgs.SlashMissed then
+            local effect = data:toSlashEffect()
+            if not effect.to:isAlive() then return false end
+            if weapon == "axe" and player:getCardCount(true) >= 2 and room:askForCard(player, "@axe", "@axe:" .. effect.to:objectName(), data, "axe") then
+                room:setEmotion(player, "weapon/axe")
+                room:slashResult(effect, nil)
+            elseif weapon == "blade" and effect.from:canSlash(effect.to, nil, false) then
+                effect.from:setFlags("BladeUse")
+                local use = room:askForUseSlashTo(effect.from, effect.to, "blade-slash:"..effect.to:objectName(), false, true)
+                if not use then
+                    effect.from:setFlags("-BladeUse")
+                end
+            end
+        elseif event == sgs.PreCardUsed and weapon == "fan" then
+            local use =data:toCardUse()
+            local card = use.card
+            if card:objectName() == "slash" and not card:isVirtualCard() and use.from:objectName() == player:objectName() then
+                local acard = sgs.Sanguosha:cloneCard("fire_slash", card:getSuit(), card:getNumber())
+                acard:addSubcard(card)
+                acard:setSkillName("fan")
+                if card:hasFlag("drank") then
+                    room:setCardFlag(acard, "drank")
+                    acard:setTag("drank", sgs.QVariant(1))
+                end
+                if room:askForSkillInvoke(player, "fan", data) then
+                    use.card = acard
+                    data:setValue(use)
+                    room:setEmotion(player, "weapon/fan")
+                end
+            end
+        elseif player:getPhase() == sgs.Player_Play then
+            if event == sgs.EventPhaseStart then
+                local weapon = room:askForChoice(player, "jaxZongshi", "crossbow+ice_sword+double_sword+guding_blade+qinggang_sword+axe+blade+spear+fan+halberd+kylin_bow")
+                room:setPlayerProperty(player, "jaxZongshi-weapon", sgs.QVariant(weapon))
+                room:broadcastSkillInvoke(self:objectName())
+                local msg = sgs.LogMessage()
+                msg.from = player
+                msg.type = "#jaxZongshi-getweapon"
+                msg.arg = weapon
+                room:sendLog(msg)
+            elseif event == sgs.EventPhaseEnd then
+                room:setPlayerProperty(player, "jaxZongshi-weapon", sgs.QVariant(""))
+            end
+        end
+        return false
+    end
+}
+
+extension:insertRelatedSkills("jaxZongshi", "#jaxZongshiTargetMod")
+jax:addSkill(jaxZongshiTargetMod)
+jax:addSkill(jaxZongshiTrigger)
+jax:addSkill(jaxZongshi)
+```

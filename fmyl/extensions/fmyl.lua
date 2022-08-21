@@ -144,120 +144,120 @@ wyl:addSkill(tianyou)
 yly = sgs.General(extension, "yly", "god",3) 
 
 gongshou = sgs.CreateTriggerSkill{
-	name = "gongshou",
-	frequency = sgs.Skill_Compulsory,
-	events = {sgs.TurnStart},
-	on_trigger = function(self, event, player, data)
-		if player then
-			room = player:getRoom()
-			yly = room:findPlayerBySkillName(self:objectName())
-			local msg = sgs.LogMessage()
-			msg.from=yly
-			if player:objectName()==yly:objectName() then
-				local result = room:askForChoice(player, self:objectName(), "nan+nv")
-				if result == "nan" then
-					msg.type = "#tomale"
-					player:setGender(sgs.General_Male)
-				else
-					player:setGender(sgs.General_Female)
-					msg.type = "#tofemale"
-				end
-			else
-				if player:isMale() then
-					yly:setGender(sgs.General_Female)
-					msg.type = "#tofemale"
-				elseif player:isFemale() then
-					yly:setGender(sgs.General_Male)
-					msg.type = "#tomale"
-				else
-					yly:setGender(sgs.General_Neuter)
-					msg.type = "#toneuter"
-				end
-			end
-			room:sendLog(msg)
-		end
-		return false
-	end,
-	can_trigger = function(self, target)
-		return true
-	end
+    name = "gongshou",
+    frequency = sgs.Skill_Compulsory,
+    events = {sgs.TurnStart},
+    on_trigger = function(self, event, player, data)
+        if player then
+            room = player:getRoom()
+            yly = room:findPlayerBySkillName(self:objectName())
+            local msg = sgs.LogMessage()
+            msg.from=yly
+            if player:objectName()==yly:objectName() then
+                local result = room:askForChoice(player, self:objectName(), "nan+nv")
+                if result == "nan" then
+                    msg.type = "#tomale"
+                    player:setGender(sgs.General_Male)
+                else
+                    player:setGender(sgs.General_Female)
+                    msg.type = "#tofemale"
+                end
+            else
+                if player:isMale() then
+                    yly:setGender(sgs.General_Female)
+                    msg.type = "#tofemale"
+                elseif player:isFemale() then
+                    yly:setGender(sgs.General_Male)
+                    msg.type = "#tomale"
+                else
+                    yly:setGender(sgs.General_Neuter)
+                    msg.type = "#toneuter"
+                end
+            end
+            room:sendLog(msg)
+        end
+        return false
+    end,
+    can_trigger = function(self, target)
+        return true
+    end
 }
 
 jieyi = sgs.CreateViewAsSkill{  --解衣
-	name = "jieyi",
-	n=1,
-	view_filter = function(self, selected, to_select)
-		return to_select:getTypeId() == 3 --是装备
-	end,
-	
-	view_as = function(self, cards)
-		if #cards == 1 then
-			local vs_card=jieyiCard:clone()
-			vs_card:addSubcard(cards[1])
-			return vs_card
-		end
-		return false;
-	end
+    name = "jieyi",
+    n=1,
+    view_filter = function(self, selected, to_select)
+        return to_select:getTypeId() == 3 --是装备
+    end,
+    
+    view_as = function(self, cards)
+        if #cards == 1 then
+            local vs_card=jieyiCard:clone()
+            vs_card:addSubcard(cards[1])
+            return vs_card
+        end
+        return false;
+    end
 }
 
 jieyiCard = sgs.CreateSkillCard{
-	name = "jieyiCard", --必须
-	target_fixed = true, --必须
-	will_throw = true, --必须
-	filter = function(self, targets, to_select) --必须
-		return true
-	end,
+    name = "jieyiCard", --必须
+    target_fixed = true, --必须
+    will_throw = true, --必须
+    filter = function(self, targets, to_select) --必须
+        return true
+    end,
 
-	on_use = function(self, room, source, targets) --几乎必须
-		room:drawCards(source,1)
-		local card=sgs.Sanguosha:getCard(self:getSubcards():first())
-	--	local Fangju={63,64,106,110,123,182,184 Armor
-		
-		if  card:isKindOf("Armor") then
-			local theRecover=sgs.RecoverStruct()
-			theRecover.recover=1
-			theRecover.who=source
-			room:recover(source,theRecover)
-		end
-	end,
+    on_use = function(self, room, source, targets) --几乎必须
+        room:drawCards(source,1)
+        local card=sgs.Sanguosha:getCard(self:getSubcards():first())
+    --  local Fangju={63,64,106,110,123,182,184 Armor
+        
+        if  card:isKindOf("Armor") then
+            local theRecover=sgs.RecoverStruct()
+            theRecover.recover=1
+            theRecover.who=source
+            room:recover(source,theRecover)
+        end
+    end,
 }
 
 tiaoqing = sgs.CreateTriggerSkill{--调情
-	name = "tiaoqing",
-	events = {sgs.TargetConfirmed},
-	on_trigger = function(self,event,player,data)
-		local use = data:toCardUse()
-		local card = use.card
-		if card:isKindOf("Slash") and use.from:objectName()==player:objectName() then
-			for _,p in sgs.qlist(use.to) do
-				if p:getGender() ~= use.from:getGender() then
-					if player:askForSkillInvoke(self:objectName()) then
-						local room = p:getRoom()
-						if not p:isKongcheng() then
-							if not room:askForDiscard(p,self:objectName(),1,1,true,false,"@tiaoqing:"..use.from:objectName()) then
-								use.from:drawCards(1)
-							end
-						else
-							use.from:drawCards(1)
-						end
-					end
-				end
-			end
-		end
-		return false
-	end,
+    name = "tiaoqing",
+    events = {sgs.TargetConfirmed},
+    on_trigger = function(self,event,player,data)
+        local use = data:toCardUse()
+        local card = use.card
+        if card:isKindOf("Slash") and use.from:objectName()==player:objectName() then
+            for _,p in sgs.qlist(use.to) do
+                if p:getGender() ~= use.from:getGender() then
+                    if player:askForSkillInvoke(self:objectName()) then
+                        local room = p:getRoom()
+                        if not p:isKongcheng() then
+                            if not room:askForDiscard(p,self:objectName(),1,1,true,false,"@tiaoqing:"..use.from:objectName()) then
+                                use.from:drawCards(1)
+                            end
+                        else
+                            use.from:drawCards(1)
+                        end
+                    end
+                end
+            end
+        end
+        return false
+    end,
 }
 
 TiaoqingTargetMod = sgs.CreateTargetModSkill{
-	name = "#tiaoqing-target",
-	pattern = "Slash",
-	distance_limit_func = function(self, player)
-		if player:hasSkill(self:objectName()) then
-			return 1
-		else
-			return 0
-		end
-	end
+    name = "#tiaoqing-target",
+    pattern = "Slash",
+    distance_limit_func = function(self, player)
+        if player:hasSkill(self:objectName()) then
+            return 1
+        else
+            return 0
+        end
+    end
 }
 
 extension:insertRelatedSkills("tiaoqing", "#tiaoqing-target")
@@ -784,10 +784,20 @@ jaxZongshi = sgs.CreateViewAsSkill{
         return slash
     end ,
     enabled_at_play = function(self, player)
-        return player:property("jaxZongshi-weapon"):toString() == "spear" and (player:getHandcardNum() >= 2) and sgs.Slash_IsAvailable(player)
+        local markRequired = 1
+        local weapon = player:property("jaxZongshi-weapon"):toString()
+        if string.find(weapon, "<crossbow>") and player:hasFlag("Global_MoreSlashInOneTurn") then
+            markRequired = markRequired + 1
+        end
+        return string.find(weapon, "<spear>") and (player:getHandcardNum() >= 2) and sgs.Slash_IsAvailable(player) and player:getMark("@jingtieMark") >= markRequired
     end ,
     enabled_at_response = function(self, player, pattern)
-        return player:property("jaxZongshi-weapon"):toString() == "spear" and (player:getHandcardNum() >= 2) and (pattern == "slash")
+        local markRequired = 1
+        local weapon = player:property("jaxZongshi-weapon"):toString()
+        if string.find(weapon, "<blade>") and player:hasFlag("blading") then
+            markRequired = markRequired + 1
+        end
+        return string.find(weapon, "<spear>") and (player:getHandcardNum() >= 2) and (pattern == "slash") and player:getMark("@jingtieMark") >= markRequired
     end
 }
 
@@ -797,26 +807,37 @@ jaxZongshiTargetMod = sgs.CreateTargetModSkill{
     distance_limit_func = function(self, from, card)
         local weapon = from:property("jaxZongshi-weapon"):toString()
         if not weapon or not from:hasSkill("jaxZongshi") then return 0 end
-        if weapon == "guding_blade" or weapon == "double_sword" or weapon == "qinggang_sword" or weapon == "ice_sword" then
-            return 1
-        elseif weapon == "axe" or weapon == "blade" or weapon == "spear" then
-            return 2
-        elseif weapon == "fan" or weapon == "halberd" then 
-            return 3
-        elseif weapon == "kylin_bow" then
+        if string.find(weapon, "<kylin_bow>") then
             return 4
+        end
+        if string.find(weapon, "<fan>") or string.find(weapon, "<halberd>") then 
+            return 3
+        end
+        if string.find(weapon, "<axe>") or string.find(weapon, "<blade>") or string.find(weapon, "<spear>") then
+            return 2
+        end
+        if string.find(weapon, "<guding_blade>") or string.find(weapon, "<double_sword>") or string.find(weapon, "<qinggang_sword>") or string.find(weapon, "<ice_sword>") then
+            return 1
         end
         return 0
     end,
     residue_func = function(self, player)
-        if player:hasSkill("jaxZongshi") and player:property("jaxZongshi-weapon"):toString() == "crossbow" then
+        if player:hasSkill("jaxZongshi") and string.find(player:property("jaxZongshi-weapon"):toString(), "<crossbow>") and player:getMark("@jingtieMark") > 0 then
             return 999
         else
             return 0
         end
     end,
     extra_target_func = function(self, from, card)
-        if from:hasSkill("jaxZongshi") and from:property("jaxZongshi-weapon"):toString() == "halberd" and from:isLastHandCard(card) then
+        local markRequired = 1
+        local weapon = from:property("jaxZongshi-weapon"):toString()
+        if string.find(weapon, "<crossbow>") and from:hasFlag("Global_MoreSlashInOneTurn") then
+            markRequired = markRequired + 1
+        end
+        if string.find(weapon, "<spear>") and card:getSkillName() == "spear" then
+            markRequired = markRequired + 1
+        end
+        if from:hasSkill("jaxZongshi") and string.find(weapon, "<halberd>") and from:isLastHandCard(card) and from:getMark("@jingtieMark") >= markRequired then
             return 2
         else
             return 0
@@ -826,17 +847,23 @@ jaxZongshiTargetMod = sgs.CreateTargetModSkill{
 
 jaxZongshiTrigger = sgs.CreateTriggerSkill{
     name = "jaxZongshi",
-    events = {sgs.DamageCaused,sgs.TargetSpecified,sgs.SlashMissed,sgs.PreCardUsed,sgs.EventPhaseStart,sgs.EventPhaseEnd},
+    events = {sgs.DamageCaused,sgs.TargetSpecified,sgs.SlashMissed,sgs.PreCardUsed,sgs.EventPhaseStart,sgs.EventPhaseEnd,sgs.GameStart},
     view_as_skill = jaxZongshi,
     on_trigger = function(self, event, player, data)
         if not player or not player:hasSkill("jaxZongshi") then return false end
         local room = player:getRoom()
         local weapon = player:property("jaxZongshi-weapon") :toString()
+        if event == sgs.GameStart then
+            player:gainMark("@jingtieMark",room:alivePlayerCount())
+            return
+        end
         if event == sgs.DamageCaused then
             local damage = data:toDamage()
             if damage.card and damage.card:isKindOf("Slash")  and damage.by_user and not damage.chain and not damage.transfer then
-                if weapon == "ice_sword" and not damage.to:isNude() and damage.from:canDiscard(damage.to, "he") and player:askForSkillInvoke("ice_sword", data) then
+                if string.find(weapon, "<ice_sword>") and not damage.to:isNude() and damage.from:canDiscard(damage.to, "he") 
+                    and player:getMark("@jingtieMark") > 0 and player:askForSkillInvoke("ice_sword", data) then
                     room:setEmotion(player, "weapon/ice_sword")
+                    player:loseMark("@jingtieMark")
                     local card_id = room:askForCardChosen(player, damage.to, "he", "ice_sword", false, sgs.Card_MethodDiscard);
                     room:throwCard(sgs.Sanguosha:getCard(card_id), damage.to, damage.from)
                     if damage.from:isAlive() and damage.to:isAlive() and damage.from:canDiscard(damage.to, "he") then
@@ -844,8 +871,10 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
                         room:throwCard(sgs.Sanguosha:getCard(card_id), damage.to, damage.from)
                     end
                     return true
-                elseif weapon == "guding_blade" and damage.to:isKongcheng() then
+                end
+                if string.find(weapon, "<guding_blade>") and damage.to:isKongcheng() and player:getMark("@jingtieMark") > 0 then
                     room:setEmotion(player, "weapon/guding_blade")
+                    player:loseMark("@jingtieMark")
                     local log = sgs.LogMessage()
                     log.type = "#GudingBladeEffect"
                     log.from = player
@@ -855,7 +884,8 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
                     log.arg2 = tostring(damage.damage)
                     room:sendLog(log)
                     data:setValue(damage)
-                elseif weapon == "kylin_bow" then
+                end
+                if string.find(weapon, "<kylin_bow>") then
                     local horses = {}
                     if damage.to:getDefensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getDefensiveHorse():getEffectiveId()) then
                         table.insert(horses, "dhorse")
@@ -863,10 +893,11 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
                     if damage.to:getOffensiveHorse() and damage.from:canDiscard(damage.to, damage.to:getOffensiveHorse():getEffectiveId()) then
                         table.insert(horses, "ohorse")
                     end
-                    if #horses == 0 or not player:askForSkillInvoke("kylin_bow", data) then
+                    if #horses == 0 or player:getMark("@jingtieMark") == 0 or not player:askForSkillInvoke("kylin_bow", data) then
                         return false
                     end
                     room:setEmotion(player, "weapon/kylin_bow")
+                    player:loseMark("@jingtieMark")
                     local horse_type = room:askForChoice(player, "kylin_bow", table.concat(horses, "+"))
                     if horse_type == "dhorse" then
                         room:throwCard(damage.to:getDefensiveHorse(), damage.to, damage.from)
@@ -878,16 +909,18 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
         elseif event==sgs.TargetSpecified then
             local use = data:toCardUse()
             if not use.card:isKindOf("Slash") then return false end
-            if weapon == "double_sword" then
+            if string.find(weapon, "<double_sword>") then
                 for _,p in sgs.qlist(use.to) do
-                    if p:getGender() ~= use.from:getGender() and use.from:askForSkillInvoke("double_sword") then
+                    if p:getGender() ~= use.from:getGender() and player:getMark("@jingtieMark") > 0 and use.from:askForSkillInvoke("double_sword") then
                         room:setEmotion(use.from, "weapon/double_sword")
+                        player:loseMark("@jingtieMark")
                         if not p:canDiscard(p, "h") or not room:askForCard(p, ".", "double-sword-card:"..use.from:objectName(),data) then
                             use.from:drawCards(1, "double_sword")
                         end
                     end
                 end
-            elseif weapon == "qinggang_sword" then
+            end
+            if string.find(weapon, "<qinggang_sword>") and player:getMark("@jingtieMark") > 0 then
                 local do_anim = false
                 for _,p in sgs.qlist(use.to) do
                     if (p:getArmor() and p:hasArmorEffect(p:getArmor():objectName())) or p:hasSkills("bazhen|linglong|bossmanjia") then
@@ -897,52 +930,84 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
                 end
                 if do_anim then
                     room:setEmotion(use.from, "weapon/qinggang_sword")
+                    player:loseMark("@jingtieMark")
                 end
-            elseif weapon == "crossbow" and use.from:hasFlag("Global_MoreSlashInOneTurn") then
-                room:setEmotion(use.from, "weapon/crossbow")
-            elseif weapon == "halberd" and use.to:length() > 1 then
-                room:setEmotion(use.from, "weapon/halberd")
             end
         elseif event == sgs.SlashMissed then
             local effect = data:toSlashEffect()
             if not effect.to:isAlive() then return false end
-            if weapon == "axe" and player:getCardCount(true) >= 2 and room:askForCard(player, "@axe", "@axe:" .. effect.to:objectName(), data, "axe") then
-                room:setEmotion(player, "weapon/axe")
-                room:slashResult(effect, nil)
-            elseif weapon == "blade" and effect.from:canSlash(effect.to, nil, false) then
+            if string.find(weapon, "<blade>") and effect.from:canSlash(effect.to, nil, false) and player:getMark("@jingtieMark") > 0 then
                 effect.from:setFlags("BladeUse")
+                effect.from:setFlags("blading") -- for jax only
                 local use = room:askForUseSlashTo(effect.from, effect.to, "blade-slash:"..effect.to:objectName(), false, true)
                 if not use then
                     effect.from:setFlags("-BladeUse")
+                    effect.from:setFlags("-blading")
                 end
             end
-        elseif event == sgs.PreCardUsed and weapon == "fan" then
-            local use =data:toCardUse()
+            if string.find(weapon, "<axe>") and player:getMark("@jingtieMark") > 0 and player:getCardCount(true) >= 2 and room:askForCard(player, "@axe", "@axe:" .. effect.to:objectName(), data, "axe") then
+                player:loseMark("@jingtieMark")
+                room:setEmotion(player, "weapon/axe")
+                room:slashResult(effect, nil)
+            end
+        elseif event == sgs.PreCardUsed then
+            local use = data:toCardUse()
             local card = use.card
-            if card:objectName() == "slash" and not card:isVirtualCard() and use.from:objectName() == player:objectName() then
+            if not card:isKindOf("Slash") then return false end
+            --room:writeToConsole(player:getFlags())
+            if string.find(weapon, "<crossbow>") and use.from:hasFlag("Global_MoreSlashInOneTurn") then
+                room:setEmotion(use.from, "weapon/crossbow")
+                player:loseMark("@jingtieMark")
+            end
+            if string.find(weapon, "<halberd>") and use.to:length() > 1 then
+                room:setEmotion(use.from, "weapon/halberd")
+                player:loseMark("@jingtieMark")
+            end
+            if string.find(weapon, "<blade>") and use.from:hasFlag("blading") then
+                player:loseMark("@jingtieMark")
+            end
+            if string.find(weapon, "<spear>") and use.card:getSkillName() == "spear" then
+                player:loseMark("@jingtieMark")
+            end
+            if string.find(weapon,"<fan>") and player:getMark("@jingtieMark") > 0 and card:objectName() == "slash" and use.from:objectName() == player:objectName() 
+                and room:askForSkillInvoke(player, "fan", data) then
+                player:loseMark("@jingtieMark")
                 local acard = sgs.Sanguosha:cloneCard("fire_slash", card:getSuit(), card:getNumber())
-                acard:addSubcard(card)
+                if not card:isVirtualCard() or card:subcardsLength() > 0 then
+                    acard:addSubcards(card)
+                end
                 acard:setSkillName("fan")
                 if card:hasFlag("drank") then
                     room:setCardFlag(acard, "drank")
                     acard:setTag("drank", sgs.QVariant(1))
                 end
-                if room:askForSkillInvoke(player, "fan", data) then
-                    use.card = acard
-                    data:setValue(use)
-                    room:setEmotion(player, "weapon/fan")
-                end
+                use.card = acard
+                data:setValue(use)
+                room:setEmotion(player, "weapon/fan")
             end
         elseif player:getPhase() == sgs.Player_Play then
             if event == sgs.EventPhaseStart then
-                local weapon = room:askForChoice(player, "jaxZongshi", "crossbow+ice_sword+double_sword+guding_blade+qinggang_sword+axe+blade+spear+fan+halberd+kylin_bow")
-                room:setPlayerProperty(player, "jaxZongshi-weapon", sgs.QVariant(weapon))
-                room:broadcastSkillInvoke(self:objectName())
-                local msg = sgs.LogMessage()
-                msg.from = player
-                msg.type = "#jaxZongshi-getweapon"
-                msg.arg = weapon
-                room:sendLog(msg)
+                player:gainMark("@jingtieMark")
+                local chosen_weapon_str = ""
+                local weapon_tbl = {"crossbow","ice_sword","double_sword","guding_blade","qinggang_sword","axe","blade","spear","fan","halberd","kylin_bow"}
+                while #weapon_tbl > 0 and player:getMark("@jingtieMark") > 0 do
+                    local weapon = room:askForChoice(player, "jaxZongshi", table.concat(weapon_tbl,"+").."+cancel")
+                    if weapon == "cancel" then break end
+                    for i=1, #weapon_tbl do
+                        if weapon_tbl[i] == weapon then
+                            table.remove(weapon_tbl, i)
+                            break
+                        end
+                    end
+                    chosen_weapon_str = chosen_weapon_str .. "<" .. weapon .. ">"
+                    player:loseMark("@jingtieMark")
+                    local msg = sgs.LogMessage()
+                    msg.from = player
+                    msg.type = "#jaxZongshi-getweapon"
+                    msg.arg = weapon
+                    room:sendLog(msg)
+                end
+                room:setPlayerProperty(player, "jaxZongshi-weapon", sgs.QVariant(chosen_weapon_str))
             elseif event == sgs.EventPhaseEnd then
                 room:setPlayerProperty(player, "jaxZongshi-weapon", sgs.QVariant(""))
             end
@@ -961,52 +1026,52 @@ jax:addSkill(jaxZongshi)
 --------------------------------------------------------------------
 --以下为字符串表
 sgs.LoadTranslationTable{
-	["designer:yly"]="风靡义磊",
-	["illustrator:yly"]="风靡义磊",
-	["fmyl"]="风靡包",
+    ["designer:yly"]="风靡义磊",
+    ["illustrator:yly"]="风靡义磊",
+    ["fmyl"]="风靡包",
 
-	["yly"]="袁镭洋",
-	["gongshou"] = "攻受",
-	[":gongshou"] = "锁定技。其他角色回合开始时，你的性别变成与之相反。你的回合开始时，需选择性别。",
-	["jieyi"]="解衣",
-	[":jieyi"]="出牌阶段，你可以弃掉一张装备牌，然后摸一张牌。你以此法弃掉防具时回复一点体力。",
-	["jieyiCard"]="解衣",
-	[":gongshou:"] = "请选择性别:",
-	["gongshou:nan"] = "男性",
-	["gongshou:nv"] = "女性",
-	["tiaoqing"]="调情",
+    ["yly"]="袁镭洋",
+    ["gongshou"] = "攻受",
+    [":gongshou"] = "锁定技。其他角色回合开始时，你的性别变成与之相反。你的回合开始时，需选择性别。",
+    ["jieyi"]="解衣",
+    [":jieyi"]="出牌阶段，你可以弃掉一张装备牌，然后摸一张牌。你以此法弃掉防具时回复一点体力。",
+    ["jieyiCard"]="解衣",
+    [":gongshou:"] = "请选择性别:",
+    ["gongshou:nan"] = "男性",
+    ["gongshou:nv"] = "女性",
+    ["tiaoqing"]="调情",
     [":tiaoqing"]="你的杀指定异性角色为目标时，可以令其选择一项：弃一张手牌或让你摸一张牌。锁定技。你的杀攻击范围始终加一。",
     ["@tiaoqing"]="%src 发动了技能“调情”，你须弃置一张手牌，或令 %src 摸一张牌",
-    ["#tomale"]=  "%from 的性别变成男性。",
-    ["#tofemale"]="%from 的性别变成女性。",
-    ["#toneuter"]="%from 的性别变成中性。",
+    ["#tomale"]=  "%from 的性别变成男性",
+    ["#tofemale"]="%from 的性别变成女性",
+    ["#toneuter"]="%from 的性别变成中性",
     ["#hello"] = "测试用：%from",
 
     ["wyl"]="王义磊",
     ["#wyl"]="风靡的钢琴家",
-	["shenmou"]="深谋",
-	[":shenmou"]="你的非延时锦囊不能被【无懈可击】响应",
-	["yuanlv"]="远虑",
-	["yuanlvCard"]="远虑",
-	[":yuanlv"]="当有角色的锦囊指定了至少两个目标时，你可以弃一些牌并指定等量目标角色，使此锦囊对这些角色无效。",
-	["@yuanlv"]="使你的锦囊对若干角色无效。",
-	["~yuanlv"]="弃掉X张牌并指定X个目标，若点击取消则不发动。",
-	["tianyou"]="天佑",
-	[":tianyou"]="你的每张点数为素数的牌因弃置而置入弃牌堆时，你可以摸一张牌。",
+    ["shenmou"]="深谋",
+    [":shenmou"]="你的非延时锦囊不能被【无懈可击】响应",
+    ["yuanlv"]="远虑",
+    ["yuanlvCard"]="远虑",
+    [":yuanlv"]="当有角色的锦囊指定了至少两个目标时，你可以弃一些牌并指定等量目标角色，使此锦囊对这些角色无效。",
+    ["@yuanlv"]="使你的锦囊对若干角色无效。",
+    ["~yuanlv"]="弃掉X张牌并指定X个目标，若点击取消则不发动。",
+    ["tianyou"]="天佑",
+    [":tianyou"]="你的每张点数为素数的牌因弃置而置入弃牌堆时，你可以摸一张牌。",
 
     ["ljf"]="罗剑锋",
     ["qiuyi"] = "求异",
     [":qiuyi"] = "阶段技。你可以弃一张【杀】并指定一名其他角色，该角色需弃置一张【闪】或受到你的一点伤害。",
     ["zimo"] = "自摸",
     [":zimo"] = "一名角色的准备阶段时，若其判定区有牌，你可以观看牌堆顶的一张牌，然后你可以获得之。",
-    ["@qiuyi-jink"] = "弃置一张【闪】，否则受到 %src 对你造成的一点伤害。",
+    ["@qiuyi-jink"] = "弃置一张【闪】，否则受到 %src 对你造成的一点伤害",
 
     ["hsz"]="何思卓",
     ["zhengzhuang"]="整装",
     [":zhengzhuang"]="回合结束时，你可以弃一张非基本牌并指定一名角色，该角色开始一个额外的、由你指定的阶段。",
-    ["@zhengzhuang"]="你可以弃一张非基本牌并指定一名角色开始一个阶段。",
-    ["~zhengzhuang"]="选择基本牌，选择角色，然后选择阶段。",
-    ["#zhengzhuang"]="%from 令 %to 开始了一个额外的 %arg。",
+    ["@zhengzhuang"]="你可以弃一张非基本牌并指定一名角色开始一个阶段",
+    ["~zhengzhuang"]="选择基本牌，选择角色，然后选择阶段",
+    ["#zhengzhuang"]="%from 令 %to 开始了一个额外的 %arg",
     ["zhengzhuang:1"]="准备阶段",
     ["zhengzhuang:2"]="判定阶段",
     ["zhengzhuang:3"]="摸牌阶段",
@@ -1054,7 +1119,7 @@ sgs.LoadTranslationTable{
     ["$jaxZongshi1"]="把他们也算上！",
     ["$jaxZongshi2"]="看招！",
     ["jaxZongshi"]="宗师",
-    [":jaxZongshi"]="锁定技。出牌阶段开始时，你获得一张武器牌的攻击范围和效果直到出牌阶段结束。",
-    ["#jaxZongshi-getweapon"]="%from 获得了 %arg 的攻击范围和效果。",
+    [":jaxZongshi"]="游戏开始时，你获得等同于玩家数量的“精铁”标记；出牌阶段开始时，你获得一枚“精铁标记”，然后你可以弃掉一些“精铁”标记来声明同等数量的武器。直到出牌阶段结束，你获得声明武器的最大攻击范围，且可以发动这些武器的效果，但每次发动效果需要先消耗一个标记。",
+    ["#jaxZongshi-getweapon"]="%from 声明了武器 %arg",
+    ["@jingtieMark"]="精铁",
 }
-
