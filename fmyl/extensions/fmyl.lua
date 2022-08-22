@@ -973,8 +973,10 @@ jaxZongshiTrigger = sgs.CreateTriggerSkill{
                 and room:askForSkillInvoke(player, "fan", data) then
                 player:loseMark("@jingtieMark")
                 local acard = sgs.Sanguosha:cloneCard("fire_slash", card:getSuit(), card:getNumber())
-                if not card:isVirtualCard() or card:subcardsLength() > 0 then
-                    acard:addSubcards(card)
+                if card:getSkillName() == "spear" then
+                    acard:addSubcards(card:getSubcards())
+                else
+                    acard:addSubcard(card)
                 end
                 acard:setSkillName("fan")
                 if card:hasFlag("drank") then
